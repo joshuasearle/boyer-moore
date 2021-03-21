@@ -21,12 +21,10 @@ def get_good_suffix_values(pat):
     m = len(pat)
     z_suffix_values = get_z_suffix_values(pat)
 
-    good_suffix_values = [0 for _ in range(m)]
+    good_suffix_values = [0 for _ in range(m + 1)]
     
     for i in range(m - 1):
         p = z_suffix_values[i]
-        if p == 0:
-            continue
         j = m - p
         good_suffix_values[j] = i
     
@@ -55,11 +53,12 @@ def get_matched_prefix_values(pat):
 
 
 def find_good_suffix_rule_shift(good_suffix_values, matched_prefix_values, k, m):
-
-    if no_char_matched(k, m):
-        return handle_no_char_match()
     
     good_suffix_value = good_suffix_values[k + 1]
+
+    if no_char_matched(k, m):
+        return handle_no_char_match(good_suffix_value, k, m)
+    
     matched_prefix_value = matched_prefix_values[k + 1]
     
     if full_match(k):
@@ -100,14 +99,15 @@ def handle_full_match(matched_prefix_values, m):
         return (shift, l, r)
 
 
-def handle_no_char_match():
-    return (1, -1, -1)
+def handle_no_char_match(good_suffix_value, k, m):
+    return handle_good_suffix_exists(good_suffix_value, k, m)
 
 
 def handle_good_suffix_exists(good_suffix_value, k, m):
     suffix_length = m - k - 1
     shift = m - good_suffix_value - 1
-    l = good_suffix_value - suffix_length + 1
+    # min to handle case where suffix length is zero
+    l = min(good_suffix_value - suffix_length + 1, good_suffix_value)
     r = good_suffix_value
     return (shift, l, r)
 
